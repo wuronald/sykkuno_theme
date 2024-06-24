@@ -1,0 +1,97 @@
+---
+title: "01_simple_plots"
+author: "Ronald Wu"
+date: "2024-06-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Load Packages and Themes
+```{r load theme}
+library(ggplot2)
+library(grid)
+
+# load sykkuno theme
+source("scripts/theme_sykkuno.R")
+```
+
+# Basic Plots
+## Setup
+```{r plots}
+# Example 1: Bar plot
+set.seed(42)
+data <- data.frame(
+  category = LETTERS[1:8],
+  value = sample(50:150, 8)
+)
+
+bar_plot <- ggplot(data, aes(x = category, y = value, fill = category)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = sykkuno_colors) +
+  labs(title = "Sykkuno-style Bar Plot", x = "Category", y = "Value") +
+  theme_sykkuno() +
+  theme(legend.position = "none")
+
+# Example 2: Scatter plot
+set.seed(42)
+data <- data.frame(
+  x = rnorm(200),
+  y = rnorm(200),
+  group = rep(LETTERS[1:8], each = 25)
+)
+
+scatter_plot <- ggplot(data, aes(x = x, y = y, color = group)) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_color_manual(values = sykkuno_colors) +
+  labs(title = "Sykkuno-style Scatter Plot", x = "X-axis", y = "Y-axis") +
+  theme_sykkuno()
+
+# Example 3: Volcano plot
+set.seed(42)
+data <- data.frame(
+  log2FoldChange = rnorm(1000),
+  pvalue = 10^-runif(1000, 0, 5)
+)
+data$negLogPvalue <- -log10(data$pvalue)
+data$significance <- cut(data$negLogPvalue, 
+                         breaks = c(-Inf, 1, 2, 3, Inf), 
+                         labels = c("Low", "Medium", "High", "Very High"))
+
+volcano_plot <- ggplot(data, aes(x = log2FoldChange, y = negLogPvalue)) +
+  geom_point(aes(color = significance), alpha = 0.7) +
+  scale_color_manual(values = sykkuno_colors[c(3, 4, 1, 5)]) +
+  labs(title = "Sykkuno-style Volcano Plot", x = "log2 Fold Change", y = "-log10 p-value") +
+  theme_sykkuno()
+
+# Example 4: MA plot
+set.seed(42)
+data <- data.frame(
+  AveExpr = runif(1000, 0, 15),
+  logFC = rnorm(1000, 0, 2)
+)
+data$significance <- cut(abs(data$logFC), 
+                         breaks = c(-Inf, 1, 2, 3, Inf), 
+                         labels = c("Low", "Medium", "High", "Very High"))
+
+ma_plot <- ggplot(data, aes(x = AveExpr, y = logFC)) +
+  geom_point(aes(color = significance), alpha = 0.7) +
+  scale_color_manual(values = sykkuno_colors[c(3, 4, 1, 5)]) +
+  labs(title = "Sykkuno-style MA Plot", x = "Average Expression", y = "log Fold Change") +
+  theme_sykkuno()
+```
+
+## Display Plots
+```{r display plots}
+# Display plots
+bar_plot
+scatter_plot
+volcano_plot
+ma_plot
+```
+
+
+
